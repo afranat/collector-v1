@@ -9,4 +9,14 @@ use Nette;
 
 final class HomePresenter extends Nette\Application\UI\Presenter
 {
+    public function __construct(
+        private readonly Nette\Database\Explorer $database,
+    ) {
+        parent::__construct();
+    }
+
+    public function renderDefault(): void
+    {
+        $this->template->subjects = $this->database->table('subjects')->fetchAll();
+    }
 }
