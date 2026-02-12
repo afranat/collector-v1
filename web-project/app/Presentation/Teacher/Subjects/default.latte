@@ -1,0 +1,28 @@
+{block title}Učitel – Témata{/block}
+
+{block content}
+    <main>
+        <h1>Učitelská stránka – vytvoření témat (subjects)</h1>
+        <p>Správa témat, na kterých budou žáci spolupracovat.</p>
+
+        <section>
+            <h2>Nové téma</h2>
+            {control subjectForm}
+        </section>
+
+        <section>
+            <h2>Existující témata</h2>
+            {if $subjects}
+                <ul>
+                    <li n:foreach="$subjects as $subject">
+                        <strong>{$subject['title']}</strong>
+                        (<a n:href=":Teacher:Badges:default subjectId: $subject['id']">odznaky</a>,
+                        <a n:href=":Teacher:Collaboration:default subjectId: $subject['id']">pobídky a verifikace</a>)
+                    </li>
+                </ul>
+            {else}
+                <p>Žádná témata nejsou vytvořena.</p>
+            {/if}
+        </section>
+    </main>
+{/block}

@@ -1,0 +1,29 @@
+{block title}Učitel – Odznaky{/block}
+
+{block content}
+    <main>
+        <h1>Učitelská stránka – vytvoření odznaků</h1>
+        <p>Odznaky jsou globální a lze je použít v pobídkách napříč všemi tématy.</p>
+
+        <section>
+            <h2>Nový globální odznak</h2>
+            {control badgeForm}
+        </section>
+
+        <section>
+            <h2>Seznam globálních odznaků</h2>
+            {if $badges}
+                <ul>
+                    <li n:foreach="$badges as $badge">
+                        <strong>{$badge['title']}</strong>
+                        ({$badge['expValue']} EXP, {if $badge['isRepeatable']}opakovatelný{else}jednorázový{/if})
+                        <br>
+					{$badge['description']}
+                    </li>
+                </ul>
+            {else}
+                <p>Zatím nejsou vytvořeny žádné globální odznaky.</p>
+            {/if}
+        </section>
+    </main>
+{/block}

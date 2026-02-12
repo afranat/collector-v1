@@ -1,0 +1,71 @@
+{block title}Učitel – Spolupráce a verifikace{/block}
+
+{block content}
+    <main>
+        <h1>Učitelská stránka – spolupráce se žákem na tématu</h1>
+        <p>Vytváření pobídek pro vybrané téma, přiřazení globálních odznaků a verifikace odevzdaných claimů.</p>
+
+        <form method="get" action="{link default}">
+            <label>
+                Téma
+                <select name="subjectId" onchange="this.form.submit()">
+                    <option n:foreach="$subjects as $subject" value="{$subject['id']}" selected="{$subject['id'] === $subjectId}">{$subject['title']}</option>
+                </select>
+            </label>
+        </form>
+
+        <section>
+            <h2>Publikovat pobídku</h2>
+            {control offerForm}
+        </section>
+
+        <section>
+            <h2>Aktivní pobídky</h2>
+            {if $offers}
+                <ul>
+                    <li n:foreach="$offers as $offer">
+                        <strong>{$offer['title']}</strong>
+                        – {$offer['description']}
+                        (<em>{if $offer['requiresApproval']}vyžaduje schválení{else}auto-schválení{/if}</em>)
+                    </li>
+                </ul>
+            {else}
+                <p>Zatím nejsou publikované pobídky.</p>
+            {/if}
+        </section>
+
+        <section>
+            <h2>Claimy žáka a verifikace</h2>
+            {if $claims}
+                <table>
+                    <thead>
+                    <tr><th>Claim</th><th>Offer</th><th>Stav</th><th>Důkaz</th><th>Akce</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr n:foreach="$claims as $claim">
+                        <td>#{$claim['id']}</td>
+                        <td>{$claim['offerId']}</td>
+                        <td>{$claim['status']}</td>
+                        <td>{$claim['evidence'] ?? '-'}</td>
+                        <td>
+                            <span n:if="$claim['status'] !== 'submitted'">-</span>
+                            <a n:if="$claim['status'] === 'submitted'" n:href="approve! claimId: $claim['id'], subjectId: $subjectId">Schválit</a>
+                            <a n:if="$claim['status'] === 'submitted'" n:href="reject! claimId: $claim['id'], subjectId: $subjectId">Zamítnout</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            {else}
+                <p>Zatím nejsou žádné claimy.</p>
+            {/if}
+        </section>
+
+        <section>
+            <h2>Navigace na žákovské stránky</h2>
+            <ul>
+                <li><a n:href=":Student:Offers:default subjectId: $subjectId">Žákovské pobídky</a></li>
+                <li><a n:href=":Student:Profile:default subjectId: $subjectId">Žákovský profil</a></li>
+            </ul>
+        </section>
+    </main>
+{/block}

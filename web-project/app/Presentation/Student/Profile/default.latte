@@ -1,0 +1,37 @@
+{block title}Žákovský profil{/block}
+
+{block content}
+    <main>
+        <h1>Žákovský profil</h1>
+        <p>Souhrn zkušeností v daném tématu a přehled globálních odznaků.</p>
+
+        <form method="get" action="{link default}">
+            <label>
+                Téma
+                <select name="subjectId" onchange="this.form.submit()">
+                    <option n:foreach="$subjects as $subject" value="{$subject['id']}" selected="{$subject['id'] === $subjectId}">{$subject['title']}</option>
+                </select>
+            </label>
+        </form>
+
+        <section>
+            <h2>Zkušenosti</h2>
+            <p><strong>{$summary['expTotal']}</strong> EXP</p>
+        </section>
+
+        <section>
+            <h2>Odznaky</h2>
+            {if $badges}
+                <ul>
+                    <li n:foreach="$badges as $badge">
+                        <strong>{$badge['title']}</strong>
+                        – {$badge['description']}
+                        (<strong>{$summary['badgeTotals'][$badge['id']] ?? 0}×</strong>, {$badge['expValue']} EXP)
+                    </li>
+                </ul>
+            {else}
+                <p>Pro toto téma zatím nejsou definovány odznaky.</p>
+            {/if}
+        </section>
+    </main>
+{/block}

@@ -1,0 +1,57 @@
+{block title}Žákovské pobídky{/block}
+
+{block content}
+    <main>
+        <h1>Žákovská stránka pobídek</h1>
+        <p>Přijímej pobídky, odevzdávej důkazy a sbírej odznaky v tématu.</p>
+
+        <form method="get" action="{link default}">
+            <label>
+                Téma
+                <select name="subjectId" onchange="this.form.submit()">
+                    <option n:foreach="$subjects as $subject" value="{$subject['id']}" selected="{$subject['id'] === $subjectId}">{$subject['title']}</option>
+                </select>
+            </label>
+        </form>
+
+        <section>
+            <h2>Dostupné pobídky</h2>
+            {if $offers}
+                <ul>
+                    <li n:foreach="$offers as $offer">
+                        <h3>{$offer['title']}</h3>
+                        <p>{$offer['description']}</p>
+                        <p>Verifikace: <strong>{if $offer['requiresApproval']}ruční schválení{else}automatické schválení{/if}</strong></p>
+                        <a n:href="accept! offerId: $offer['id'], subjectId: $subjectId">Přijmout pobídku</a>
+                    </li>
+                </ul>
+            {else}
+                <p>Žádné publikované pobídky pro vybrané téma.</p>
+            {/if}
+        </section>
+
+        <section>
+            <h2>Moje claimy</h2>
+            {if $claims}
+                <table>
+                    <thead>
+                    <tr><th>ID</th><th>Offer ID</th><th>Stav</th><th>Akce</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr n:foreach="$claims as $claim">
+                        <td>{$claim['id']}</td>
+                        <td>{$claim['offerId']}</td>
+                        <td>{$claim['status']}</td>
+                        <td>
+                            <a n:if="$claim['status'] === 'accepted'" n:href="submit! claimId: $claim['id'], subjectId: $subjectId">Odevzdat důkaz</a>
+                            <span n:if="$claim['status'] !== 'accepted'">-</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            {else}
+                <p>Zatím nemáš žádné claimy.</p>
+            {/if}
+        </section>
+    </main>
+{/block}
