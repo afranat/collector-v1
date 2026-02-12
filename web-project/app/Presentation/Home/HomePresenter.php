@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Presentation\Home;
 
+use App\Presentation\BasePresenter;
 use Nette;
 
 
-final class HomePresenter extends Nette\Application\UI\Presenter
+final class HomePresenter extends BasePresenter
 {
     public function __construct(
         private readonly Nette\Database\Explorer $database,
@@ -17,8 +18,6 @@ final class HomePresenter extends Nette\Application\UI\Presenter
 
     public function renderDefault(): void
     {
-
-
         $this->template->subjects = $this->database->table('subject')->fetchAll();
     }
 }

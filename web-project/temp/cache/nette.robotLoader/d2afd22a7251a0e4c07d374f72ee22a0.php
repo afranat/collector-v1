@@ -15,22 +15,32 @@ return array (
     'App\\Model\\IncentiveDemoService' => 
     array (
       0 => '/Applications/XAMPP/xamppfiles/htdocs/collector/web-project/app/Model/IncentiveDemoService.php',
-      1 => 1770839132,
+      1 => 1770925824,
     ),
     'App\\Presentation\\Home\\HomePresenter' => 
     array (
       0 => '/Applications/XAMPP/xamppfiles/htdocs/collector/web-project/app/Presentation/Home/HomePresenter.php',
-      1 => 1770841650,
+      1 => 1770927689,
+    ),
+    'App\\Presentation\\Auth\\Login\\LoginPresenter' => 
+    array (
+      0 => '/Applications/XAMPP/xamppfiles/htdocs/collector/web-project/app/Presentation/Auth/Login/LoginPresenter.php',
+      1 => 1770927515,
     ),
     'App\\Presentation\\Student\\Offers\\OffersPresenter' => 
     array (
       0 => '/Applications/XAMPP/xamppfiles/htdocs/collector/web-project/app/Presentation/Student/Offers/OffersPresenter.php',
-      1 => 1770839504,
+      1 => 1770927783,
     ),
     'App\\Presentation\\Student\\Profile\\ProfilePresenter' => 
     array (
       0 => '/Applications/XAMPP/xamppfiles/htdocs/collector/web-project/app/Presentation/Student/Profile/ProfilePresenter.php',
-      1 => 1770843462,
+      1 => 1770927824,
+    ),
+    'App\\Presentation\\BasePresenter' => 
+    array (
+      0 => '/Applications/XAMPP/xamppfiles/htdocs/collector/web-project/app/Presentation/BasePresenter.php',
+      1 => 1770927612,
     ),
     'App\\Presentation\\Accessory\\LatteExtension' => 
     array (
@@ -50,35 +60,37 @@ return array (
     'App\\Presentation\\Teacher\\Collaboration\\CollaborationPresenter' => 
     array (
       0 => '/Applications/XAMPP/xamppfiles/htdocs/collector/web-project/app/Presentation/Teacher/Collaboration/CollaborationPresenter.php',
-      1 => 1770839775,
+      1 => 1770927902,
     ),
     'App\\Presentation\\Teacher\\Subjects\\SubjectsPresenter' => 
     array (
       0 => '/Applications/XAMPP/xamppfiles/htdocs/collector/web-project/app/Presentation/Teacher/Subjects/SubjectsPresenter.php',
-      1 => 1770839899,
+      1 => 1770927943,
     ),
     'App\\Presentation\\Teacher\\Badges\\BadgesPresenter' => 
     array (
       0 => '/Applications/XAMPP/xamppfiles/htdocs/collector/web-project/app/Presentation/Teacher/Badges/BadgesPresenter.php',
-      1 => 1770839688,
+      1 => 1770927860,
     ),
   ),
   1 => 
   array (
     'null' => 3,
     'Nette\\Database\\DI\\DatabaseExtension' => 1,
-    'App\\Presentation\\Home\\HomeDefaultTemplate' => 2,
-    'App\\Presentation\\Home\\HomeTemplate' => 2,
+    'App\\Presentation\\Home\\HomeDefaultTemplate' => 3,
+    'App\\Presentation\\Home\\HomeTemplate' => 3,
     'App\\Presentation\\Teacher\\Subjects\\SubjectsDefaultTemplate' => 3,
     'App\\Presentation\\Teacher\\Subjects\\SubjectsTemplate' => 3,
     'App\\Presentation\\Teacher\\Badges\\BadgesDefaultTemplate' => 3,
     'App\\Presentation\\Teacher\\Badges\\BadgesTemplate' => 3,
     'App\\Presentation\\Teacher\\Collaboration\\CollaborationDefaultTemplate' => 3,
     'App\\Presentation\\Teacher\\Collaboration\\CollaborationTemplate' => 3,
-    'App\\Presentation\\Student\\Offers\\OffersDefaultTemplate' => 2,
-    'App\\Presentation\\Student\\Offers\\OffersTemplate' => 2,
-    'App\\Presentation\\Student\\Profile\\ProfileDefaultTemplate' => 1,
-    'App\\Presentation\\Student\\Profile\\ProfileTemplate' => 1,
+    'App\\Presentation\\Student\\Offers\\OffersDefaultTemplate' => 3,
+    'App\\Presentation\\Student\\Offers\\OffersTemplate' => 3,
+    'App\\Presentation\\Student\\Profile\\ProfileDefaultTemplate' => 3,
+    'App\\Presentation\\Student\\Profile\\ProfileTemplate' => 3,
+    'App\\Presentation\\Auth\\Login\\LoginDefaultTemplate' => 1,
+    'App\\Presentation\\Auth\\Login\\LoginTemplate' => 1,
   ),
   2 => 
   array (

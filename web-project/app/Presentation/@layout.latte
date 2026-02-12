@@ -23,11 +23,16 @@
 <nav>
 	<ul>
 		<li><a n:href=":Home:default">Domů</a></li>
-		<li><a n:href=":Teacher:Subjects:default">Učitel: témata</a></li>
-		<li><a n:href=":Teacher:Badges:default">Učitel: odznaky</a></li>
-		<li><a n:href=":Teacher:Collaboration:default">Učitel: spolupráce</a></li>
-		<li><a n:href=":Student:Offers:default">Žák: pobídky</a></li>
-		<li><a n:href=":Student:Profile:default">Žák: profil</a></li>
+		<li n:if="$isTeacherRole"><a n:href=":Teacher:Subjects:default">Učitel: témata</a></li>
+		<li n:if="$isTeacherRole"><a n:href=":Teacher:Badges:default">Učitel: odznaky</a></li>
+		<li n:if="$isTeacherRole"><a n:href=":Teacher:Collaboration:default">Učitel: spolupráce</a></li>
+		<li n:if="$isStudentRole"><a n:href=":Student:Offers:default">Žák: pobídky</a></li>
+		<li n:if="$isStudentRole"><a n:href=":Student:Profile:default">Žák: profil</a></li>
+		<li n:if="!$isLoggedIn"><a n:href=":Auth:Login:default">Přihlásit</a></li>
+		<li n:if="$isLoggedIn">
+			<strong>Role: {$currentRole}</strong>
+			· <a n:href=":Auth:Login:logout!">Odhlásit</a>
+		</li>
 	</ul>
 </nav>
 

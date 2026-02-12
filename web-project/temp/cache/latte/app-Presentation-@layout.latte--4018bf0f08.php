@@ -54,37 +54,70 @@ final class Template_4018bf0f08 extends Latte\Runtime\Template
 		<li><a href="';
 		echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Home:default')) /* pos 25:10 */;
 		echo '">Domů</a></li>
-		<li><a href="';
-		echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Teacher:Subjects:default')) /* pos 26:10 */;
-		echo '">Učitel: témata</a></li>
-		<li><a href="';
-		echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Teacher:Badges:default')) /* pos 27:10 */;
-		echo '">Učitel: odznaky</a></li>
-		<li><a href="';
-		echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Teacher:Collaboration:default')) /* pos 28:10 */;
-		echo '">Učitel: spolupráce</a></li>
-		<li><a href="';
-		echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Student:Offers:default')) /* pos 29:10 */;
-		echo '">Žák: pobídky</a></li>
-		<li><a href="';
-		echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Student:Profile:default')) /* pos 30:10 */;
-		echo '">Žák: profil</a></li>
-	</ul>
+';
+		if ($isTeacherRole) /* pos 26:7 */ {
+			echo '		<li><a href="';
+			echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Teacher:Subjects:default')) /* pos 26:32 */;
+			echo '">Učitel: témata</a></li>
+';
+		}
+		if ($isTeacherRole) /* pos 27:7 */ {
+			echo '		<li><a href="';
+			echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Teacher:Badges:default')) /* pos 27:32 */;
+			echo '">Učitel: odznaky</a></li>
+';
+		}
+		if ($isTeacherRole) /* pos 28:7 */ {
+			echo '		<li><a href="';
+			echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Teacher:Collaboration:default')) /* pos 28:32 */;
+			echo '">Učitel: spolupráce</a></li>
+';
+		}
+		if ($isStudentRole) /* pos 29:7 */ {
+			echo '		<li><a href="';
+			echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Student:Offers:default')) /* pos 29:32 */;
+			echo '">Žák: pobídky</a></li>
+';
+		}
+		if ($isStudentRole) /* pos 30:7 */ {
+			echo '		<li><a href="';
+			echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Student:Profile:default')) /* pos 30:32 */;
+			echo '">Žák: profil</a></li>
+';
+		}
+		if (!$isLoggedIn) /* pos 31:7 */ {
+			echo '		<li><a href="';
+			echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Auth:Login:default')) /* pos 31:30 */;
+			echo '">Přihlásit</a></li>
+';
+		}
+		if ($isLoggedIn) /* pos 32:7 */ {
+			echo '		<li>
+			<strong>Role: ';
+			echo LR\HtmlHelpers::escapeText($currentRole) /* pos 33:18 */;
+			echo '</strong>
+			· <a href="';
+			echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Auth:Login:logout!')) /* pos 34:10 */;
+			echo '">Odhlásit</a>
+		</li>
+';
+		}
+		echo '	</ul>
 </nav>
 
 ';
-		foreach ($flashes as $flash) /* pos 34:6 */ {
+		foreach ($flashes as $flash) /* pos 39:6 */ {
 			echo '<div';
-			echo ($ʟ_tmp = array_filter(['flash', $flash->type])) ? ' class="' . LR\HtmlHelpers::escapeAttr(implode(" ", array_unique($ʟ_tmp))) . '"' : "" /* pos 34:37 */;
+			echo ($ʟ_tmp = array_filter(['flash', $flash->type])) ? ' class="' . LR\HtmlHelpers::escapeAttr(implode(" ", array_unique($ʟ_tmp))) . '"' : "" /* pos 39:37 */;
 			echo '>';
-			echo LR\HtmlHelpers::escapeText($flash->message) /* pos 34:67 */;
+			echo LR\HtmlHelpers::escapeText($flash->message) /* pos 39:67 */;
 			echo '</div>
 ';
 
 		}
 
 		echo "\n";
-		$this->renderBlock('content', [], 'html') /* pos 36:1 */;
+		$this->renderBlock('content', [], 'html') /* pos 41:1 */;
 		echo '</body>
 </html>';
 	}
@@ -95,7 +128,7 @@ final class Template_4018bf0f08 extends Latte\Runtime\Template
 		extract($this->params);
 
 		if (!$this->getReferringTemplate() || $this->getReferenceType() === 'extends') {
-			foreach (array_intersect_key(['flash' => '34'], $this->params) as $ʟ_v => $ʟ_l) {
+			foreach (array_intersect_key(['flash' => '39'], $this->params) as $ʟ_v => $ʟ_l) {
 				trigger_error("Variable \$$ʟ_v overwritten in foreach on line $ʟ_l");
 			}
 		}

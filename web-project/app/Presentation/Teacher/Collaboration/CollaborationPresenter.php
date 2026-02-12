@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Presentation\Teacher\Collaboration;
 
 use App\Model\IncentiveDemoService;
-use Nette;
-use Nette\Application\UI\Form;
 
-final class CollaborationPresenter extends Nette\Application\UI\Presenter
+use Nette\Application\UI\Form;
+use App\Presentation\BasePresenter;
+
+final class CollaborationPresenter extends BasePresenter
 {
     public function __construct(
         private readonly IncentiveDemoService $incentiveDemoService,
@@ -67,7 +68,7 @@ final class CollaborationPresenter extends Nette\Application\UI\Presenter
         return $form;
     }
 
-    public function handleApprove(int $claimId, int $subjectId): void
+    public function handleApprove(int $claimId, int $subjectId=1): void
     {
         $this->incentiveDemoService->decideClaim($claimId, true, 'Schváleno učitelem.', 1);
         $this->flashMessage('Claim byl schválen.');

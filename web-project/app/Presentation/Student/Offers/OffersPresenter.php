@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Presentation\Student\Offers;
 
 use App\Model\IncentiveDemoService;
-use Nette;
+use App\Presentation\BasePresenter;
 
-final class OffersPresenter extends Nette\Application\UI\Presenter
+final class OffersPresenter extends BasePresenter
 {
     private const STUDENT_ID = 2;
 

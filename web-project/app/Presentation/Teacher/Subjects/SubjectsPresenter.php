@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Presentation\Teacher\Subjects;
 
 use App\Model\IncentiveDemoService;
-use Nette;
-use Nette\Application\UI\Form;
 
-final class SubjectsPresenter extends Nette\Application\UI\Presenter
+use Nette\Application\UI\Form;
+use App\Presentation\BasePresenter;
+
+final class SubjectsPresenter extends BasePresenter
 {
     private const TEACHER_ID = 1;
 

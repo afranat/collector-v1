@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Presentation\Teacher\Badges;
 
 use App\Model\IncentiveDemoService;
-use Nette;
-use Nette\Application\UI\Form;
 
-final class BadgesPresenter extends Nette\Application\UI\Presenter
+use Nette\Application\UI\Form;
+use App\Presentation\BasePresenter;
+
+final class BadgesPresenter extends BasePresenter
 {
     public function __construct(
         private readonly IncentiveDemoService $incentiveDemoService,

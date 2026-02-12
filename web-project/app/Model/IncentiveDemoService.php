@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use Nette\Http\Session;
+use Nette\Database\Explorer;
 
 final class IncentiveDemoService
 {
-    private const SECTION = 'incentiveDemo';
-
     public function __construct(
-        private readonly Session $session,
+        private readonly Explorer $database,
     ) {
     }
 
@@ -20,8 +18,15 @@ final class IncentiveDemoService
      */
     public function getSubjects(): array
     {
-        $state = $this->getState();
-        return $state['subjects'];
+        return array_map(
+            static fn ($row): array => [
+                'id' => (int) $row->id,
+                'title' => (string) $row->title,
+                'ownerUserId' => (int) $row->owner_user_id,
+                'isArchived' => (bool) $row->is_archived,
+            ],
+            $this->database->table('subject')->order('id ASC')->fetchAll(),
+        );
     }
 
     /**
@@ -29,13 +34,20 @@ final class IncentiveDemoService
      */
     public function getBadges(): array
     {
-        $state = $this->getState();
-        return $state['badges'];
+        return array_map(
+            static fn ($row): array => [
+                'id' => (int) $row->id,
+                'title' => (string) $row->title,
+                'description' => (string) ($row->description ?? ''),
+                'expValue' => (int) $row->exp_value,
+                'badgeValue' => (int) $row->badge_value,
+                'isRepeatable' => (bool) $row->is_repeatable,
+            ],
+            $this->database->table('badge')->order('id ASC')->fetchAll(),
+        );
     }
 
     /**
-     * Backward-compatible alias: badges are now global for all subjects.
-     *
      * @return array<int, array{id:int,title:string,description:string,expValue:int,badgeValue:int,isRepeatable:bool}>
      */
     public function getBadgesForSubject(int $subjectId): array
@@ -48,11 +60,31 @@ final class IncentiveDemoService
      */
     public function getOffersForSubject(int $subjectId): array
     {
-        $state = $this->getState();
-        return array_values(array_filter(
-            $state['offers'],
-            static fn (array $offer): bool => $offer['subjectId'] === $subjectId && $offer['status'] === 'published',
-        ));
+        $offers = $this->database->table('offer')
+            ->where('subject_id', $subjectId)
+            ->where('status', 'published')
+            ->order('id ASC')
+            ->fetchAll();
+
+        $result = [];
+        foreach ($offers as $offer) {
+            $badgeIds = array_map(
+                static fn ($reward): int => (int) $reward->badge_id,
+                $this->database->table('offer_reward')->where('offer_id', $offer->id)->fetchAll(),
+            );
+
+            $result[] = [
+                'id' => (int) $offer->id,
+                'subjectId' => (int) $offer->subject_id,
+                'title' => (string) $offer->title,
+                'description' => (string) ($offer->description ?? ''),
+                'status' => (string) $offer->status,
+                'requiresApproval' => (bool) $offer->requires_approval,
+                'rewardBadgeIds' => $badgeIds,
+            ];
+        }
+
+        return $result;
     }
 
     /**
@@ -60,16 +92,22 @@ final class IncentiveDemoService
      */
     public function getClaimsForSubject(int $subjectId): array
     {
-        $state = $this->getState();
-        $offerIds = array_map(
-            static fn (array $offer): int => $offer['id'],
-            array_filter($state['offers'], static fn (array $offer): bool => $offer['subjectId'] === $subjectId),
-        );
+        $claims = $this->database->table('offer_claim')
+            ->where('offer.subject_id', $subjectId)
+            ->order('id ASC')
+            ->fetchAll();
 
-        return array_values(array_filter(
-            $state['claims'],
-            static fn (array $claim): bool => in_array($claim['offerId'], $offerIds, true),
-        ));
+        return array_map(
+            static fn ($claim): array => [
+                'id' => (int) $claim->id,
+                'offerId' => (int) $claim->offer_id,
+                'studentUserId' => (int) $claim->student_user_id,
+                'status' => (string) $claim->status,
+                'evidence' => null,
+                'decisionNote' => $claim->decision_note,
+            ],
+            $claims,
+        );
     }
 
     /**
@@ -77,12 +115,24 @@ final class IncentiveDemoService
      */
     public function getLedgerForStudent(int $studentUserId, ?int $subjectId = null): array
     {
-        $state = $this->getState();
-        return array_values(array_filter(
-            $state['ledger'],
-            static fn (array $entry): bool => $entry['userId'] === $studentUserId
-                && ($subjectId === null || $entry['subjectId'] === $subjectId),
-        ));
+        $selection = $this->database->table('reward_ledger')->where('user_id', $studentUserId)->order('id ASC');
+        if ($subjectId !== null) {
+            $selection->where('subject_id', $subjectId);
+        }
+
+        return array_map(
+            static fn ($row): array => [
+                'id' => (int) $row->id,
+                'subjectId' => (int) $row->subject_id,
+                'userId' => (int) $row->user_id,
+                'sourceType' => (string) $row->source_type,
+                'sourceId' => (int) $row->source_id,
+                'badgeId' => $row->badge_id !== null ? (int) $row->badge_id : null,
+                'expDelta' => (int) $row->exp_delta,
+                'badgeDelta' => (int) $row->badge_delta,
+            ],
+            $selection->fetchAll(),
+        );
     }
 
     /**
@@ -101,36 +151,32 @@ final class IncentiveDemoService
             }
         }
 
-        return [
-            'expTotal' => $expTotal,
-            'badgeTotals' => $badgeTotals,
-        ];
+        return ['expTotal' => $expTotal, 'badgeTotals' => $badgeTotals];
     }
 
     public function addSubject(string $title, int $teacherId): void
     {
-        $state = $this->getState();
-        $state['subjects'][] = [
-            'id' => $this->nextId($state['subjects']),
+        $this->ensureDemoUsers();
+        $this->database->table('subject')->insert([
             'title' => $title,
-            'ownerUserId' => $teacherId,
-            'isArchived' => false,
-        ];
-        $this->saveState($state);
+            'owner_user_id' => $teacherId,
+            'is_archived' => 0,
+        ]);
     }
 
     public function addBadge(string $title, string $description, int $expValue, bool $isRepeatable): void
     {
-        $state = $this->getState();
-        $state['badges'][] = [
-            'id' => $this->nextId($state['badges']),
+        $this->ensureDemoUsers();
+        $subjectId = $this->getOrCreateDefaultSubjectId();
+
+        $this->database->table('badge')->insert([
+            'subject_id' => $subjectId,
             'title' => $title,
             'description' => $description,
-            'expValue' => $expValue,
-            'badgeValue' => 1,
-            'isRepeatable' => $isRepeatable,
-        ];
-        $this->saveState($state);
+            'exp_value' => $expValue,
+            'badge_value' => 1,
+            'is_repeatable' => $isRepeatable ? 1 : 0,
+        ]);
     }
 
     /**
@@ -138,206 +184,167 @@ final class IncentiveDemoService
      */
     public function addOffer(int $subjectId, string $title, string $description, bool $requiresApproval, array $badgeIds): void
     {
-        $state = $this->getState();
-        $offerId = $this->nextId($state['offers']);
-        $state['offers'][] = [
-            'id' => $offerId,
-            'subjectId' => $subjectId,
+        $this->ensureDemoUsers();
+        $offer = $this->database->table('offer')->insert([
+            'subject_id' => $subjectId,
+            'created_by' => 1,
             'title' => $title,
             'description' => $description,
             'status' => 'published',
-            'requiresApproval' => $requiresApproval,
-            'rewardBadgeIds' => $badgeIds,
-        ];
-        $this->saveState($state);
+            'requires_approval' => $requiresApproval ? 1 : 0,
+        ]);
+
+        foreach ($badgeIds as $badgeId) {
+            $this->database->table('offer_reward')->insert([
+                'offer_id' => $offer->id,
+                'badge_id' => $badgeId,
+                'qty' => 1,
+                'exp_bonus' => 0,
+            ]);
+        }
     }
 
     public function acceptOffer(int $offerId, int $studentUserId): void
     {
-        $state = $this->getState();
-        $existing = $this->findClaimByOfferAndStudent($state['claims'], $offerId, $studentUserId);
+        $this->ensureDemoUsers();
+        $existing = $this->database->table('offer_claim')
+            ->where('offer_id', $offerId)
+            ->where('student_user_id', $studentUserId)
+            ->fetch();
+
         if ($existing !== null) {
             return;
         }
 
-        $offer = $this->findOfferById($state['offers'], $offerId);
-        if ($offer === null || $offer['status'] !== 'published') {
+        $offer = $this->database->table('offer')->get($offerId);
+        if ($offer === null || $offer->status !== 'published') {
             return;
         }
 
-        $claimId = $this->nextId($state['claims']);
-        $status = $offer['requiresApproval'] ? 'accepted' : 'approved';
-        $state['claims'][] = [
-            'id' => $claimId,
-            'offerId' => $offerId,
-            'studentUserId' => $studentUserId,
+        $status = (bool) $offer->requires_approval ? 'accepted' : 'approved';
+        $claim = $this->database->table('offer_claim')->insert([
+            'offer_id' => $offerId,
+            'student_user_id' => $studentUserId,
             'status' => $status,
-            'evidence' => null,
-            'decisionNote' => null,
-        ];
+            'accepted_at' => new \DateTimeImmutable(),
+        ]);
 
         if ($status === 'approved') {
-            $this->appendLedgerForOffer($state, $offer, $studentUserId, $claimId);
+            $this->appendLedgerForOffer((int) $offer->id, $studentUserId, (int) $claim->id, 1);
         }
-
-        $this->saveState($state);
     }
 
     public function submitClaim(int $claimId, int $studentUserId, string $evidence): void
     {
-        $state = $this->getState();
-        foreach ($state['claims'] as $index => $claim) {
-            if ($claim['id'] === $claimId && $claim['studentUserId'] === $studentUserId && $claim['status'] === 'accepted') {
-                $state['claims'][$index]['status'] = 'submitted';
-                $state['claims'][$index]['evidence'] = $evidence;
-                $this->saveState($state);
-                return;
-            }
+        $claim = $this->database->table('offer_claim')
+            ->where('id', $claimId)
+            ->where('student_user_id', $studentUserId)
+            ->where('status', 'accepted')
+            ->fetch();
+
+        if ($claim === null) {
+            return;
         }
+
+        $claim->update([
+            'status' => 'submitted',
+            'submitted_at' => new \DateTimeImmutable(),
+        ]);
+
+        $this->database->table('offer_claim_evidence')->insert([
+            'claim_id' => $claimId,
+            'type' => 'text',
+            'value' => $evidence,
+        ]);
     }
 
     public function decideClaim(int $claimId, bool $approve, string $note, int $teacherUserId): void
     {
-        $state = $this->getState();
-        foreach ($state['claims'] as $index => $claim) {
-            if ($claim['id'] !== $claimId || $claim['status'] !== 'submitted') {
-                continue;
-            }
+        $claim = $this->database->table('offer_claim')
+            ->where('id', $claimId)
+            ->where('status', 'submitted')
+            ->fetch();
 
-            $offer = $this->findOfferById($state['offers'], $claim['offerId']);
-            if ($offer === null) {
-                return;
-            }
-
-            $state['claims'][$index]['status'] = $approve ? 'approved' : 'rejected';
-            $state['claims'][$index]['decisionNote'] = $note;
-
-            if ($approve) {
-                $this->appendLedgerForOffer($state, $offer, $claim['studentUserId'], $claimId, $teacherUserId);
-            }
-
-            $this->saveState($state);
+        if ($claim === null) {
             return;
         }
+
+        $claim->update([
+            'status' => $approve ? 'approved' : 'rejected',
+            'decision_note' => $note,
+            'decided_at' => new \DateTimeImmutable(),
+            'decided_by' => $teacherUserId,
+        ]);
+
+        if ($approve) {
+            $this->appendLedgerForOffer((int) $claim->offer_id, (int) $claim->student_user_id, (int) $claimId, $teacherUserId);
+        }
     }
 
-    /**
-     * @param array<int, array<string,mixed>> $rows
-     */
-    private function nextId(array $rows): int
+    private function appendLedgerForOffer(int $offerId, int $studentUserId, int $claimId, int $createdBy): void
     {
-        if ($rows === []) {
-            return 1;
+        $offer = $this->database->table('offer')->get($offerId);
+        if ($offer === null) {
+            return;
         }
 
-        return (int) max(array_column($rows, 'id')) + 1;
-    }
-
-    /**
-     * @return array{subjects:array<int,array<string,mixed>>,badges:array<int,array<string,mixed>>,offers:array<int,array<string,mixed>>,claims:array<int,array<string,mixed>>,ledger:array<int,array<string,mixed>>}
-     */
-    private function getState(): array
-    {
-        $section = $this->session->getSection(self::SECTION);
-        if (!isset($section->state)) {
-            $section->state = $this->seedState();
-        }
-
-        /** @var array{subjects:array<int,array<string,mixed>>,badges:array<int,array<string,mixed>>,offers:array<int,array<string,mixed>>,claims:array<int,array<string,mixed>>,ledger:array<int,array<string,mixed>>} $state */
-        $state = $section->state;
-        return $state;
-    }
-
-    /**
-     * @param array{subjects:array<int,array<string,mixed>>,badges:array<int,array<string,mixed>>,offers:array<int,array<string,mixed>>,claims:array<int,array<string,mixed>>,ledger:array<int,array<string,mixed>>} $state
-     */
-    private function saveState(array $state): void
-    {
-        $this->session->getSection(self::SECTION)->state = $state;
-    }
-
-    /**
-     * @return array{subjects:array<int,array<string,mixed>>,badges:array<int,array<string,mixed>>,offers:array<int,array<string,mixed>>,claims:array<int,array<string,mixed>>,ledger:array<int,array<string,mixed>>}
-     */
-    private function seedState(): array
-    {
-        return [
-            'subjects' => [
-                ['id' => 1, 'title' => 'Matematika', 'ownerUserId' => 1, 'isArchived' => false],
-            ],
-            'badges' => [
-                ['id' => 1, 'title' => 'Algebra Starter', 'description' => 'Vyřešeno 5 algebraických úloh', 'expValue' => 30, 'badgeValue' => 1, 'isRepeatable' => false],
-                ['id' => 2, 'title' => 'Geometrie', 'description' => 'Správně spočtené obsahy 3 tvarů', 'expValue' => 20, 'badgeValue' => 1, 'isRepeatable' => true],
-            ],
-            'offers' => [
-                ['id' => 1, 'subjectId' => 1, 'title' => 'Procvič kvadratické rovnice', 'description' => 'Vyřeš pracovní list A.', 'status' => 'published', 'requiresApproval' => true, 'rewardBadgeIds' => [1]],
-                ['id' => 2, 'subjectId' => 1, 'title' => 'Krátký geotest', 'description' => 'Online mini test na geometrii.', 'status' => 'published', 'requiresApproval' => false, 'rewardBadgeIds' => [2]],
-            ],
-            'claims' => [],
-            'ledger' => [],
-        ];
-    }
-
-    /**
-     * @param array<int, array<string,mixed>> $offers
-     * @return array<string,mixed>|null
-     */
-    private function findOfferById(array $offers, int $offerId): ?array
-    {
-        foreach ($offers as $offer) {
-            if ($offer['id'] === $offerId) {
-                return $offer;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param array<int, array<string,mixed>> $claims
-     * @return array<string,mixed>|null
-     */
-    private function findClaimByOfferAndStudent(array $claims, int $offerId, int $studentUserId): ?array
-    {
-        foreach ($claims as $claim) {
-            if ($claim['offerId'] === $offerId && $claim['studentUserId'] === $studentUserId) {
-                return $claim;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param array{subjects:array<int,array<string,mixed>>,badges:array<int,array<string,mixed>>,offers:array<int,array<string,mixed>>,claims:array<int,array<string,mixed>>,ledger:array<int,array<string,mixed>>} $state
-     * @param array<string,mixed> $offer
-     */
-    private function appendLedgerForOffer(array &$state, array $offer, int $studentUserId, int $claimId, int $createdBy = 1): void
-    {
-        foreach ($offer['rewardBadgeIds'] as $badgeId) {
-            $badge = null;
-            foreach ($state['badges'] as $candidate) {
-                if ($candidate['id'] === $badgeId) {
-                    $badge = $candidate;
-                    break;
-                }
-            }
-
+        $rewards = $this->database->table('offer_reward')->where('offer_id', $offerId)->fetchAll();
+        foreach ($rewards as $reward) {
+            $badge = $this->database->table('badge')->get($reward->badge_id);
             if ($badge === null) {
                 continue;
             }
 
-            $state['ledger'][] = [
-                'id' => $this->nextId($state['ledger']),
-                'subjectId' => $offer['subjectId'],
-                'userId' => $studentUserId,
-                'sourceType' => 'offer_claim',
-                'sourceId' => $claimId,
-                'badgeId' => $badge['id'],
-                'expDelta' => $badge['expValue'],
-                'badgeDelta' => $badge['badgeValue'],
-                'createdBy' => $createdBy,
-            ];
+            $this->database->table('reward_ledger')->insert([
+                'subject_id' => $offer->subject_id,
+                'user_id' => $studentUserId,
+                'source_type' => 'offer_claim',
+                'source_id' => $claimId,
+                'badge_id' => $badge->id,
+                'exp_delta' => $badge->exp_value,
+                'badge_delta' => $badge->badge_value,
+                'created_by' => $createdBy,
+            ]);
         }
+    }
+
+    private function ensureDemoUsers(): void
+    {
+        $teacher = $this->database->table('user_account')->where('id', 1)->fetch();
+        if ($teacher === null) {
+            $this->database->table('user_account')->insert([
+                'id' => 1,
+                'email' => 'teacher@example.local',
+                'name' => 'Demo Teacher',
+                'role' => 'teacher',
+            ]);
+        }
+
+        $student = $this->database->table('user_account')->where('id', 2)->fetch();
+        if ($student === null) {
+            $this->database->table('user_account')->insert([
+                'id' => 2,
+                'email' => 'student@example.local',
+                'name' => 'Demo Student',
+                'role' => 'student',
+            ]);
+        }
+    }
+
+    private function getOrCreateDefaultSubjectId(): int
+    {
+        $subject = $this->database->table('subject')->order('id ASC')->fetch();
+        if ($subject !== null) {
+            return (int) $subject->id;
+        }
+
+        $this->ensureDemoUsers();
+        $inserted = $this->database->table('subject')->insert([
+            'title' => 'Obecné',
+            'owner_user_id' => 1,
+            'is_archived' => 0,
+        ]);
+
+        return (int) $inserted->id;
     }
 }
