@@ -31,7 +31,9 @@
 		<li n:if="!$isLoggedIn"><a n:href=":Auth:Login:default">Přihlásit</a></li>
 		<li n:if="$isLoggedIn">
 			<strong>Role: {$currentRole}</strong>
-			· <a n:href=":Auth:Login:logout!">Odhlásit</a>
+			{if $currentUserName !== null}· <strong>Uživatel: {$currentUserName}</strong>{/if}
+			· <a n:href=":Auth:Login:logout">Odhlásit</a>
+
 		</li>
 	</ul>
 </nav>

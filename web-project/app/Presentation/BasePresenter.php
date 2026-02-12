@@ -15,6 +15,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     private const SESSION_SECTION = 'auth';
     private const SESSION_ROLE_KEY = 'role';
 
+    private const SESSION_USER_NAME_KEY = 'userName';
+
     protected function startup(): void
     {
         parent::startup();
@@ -41,6 +43,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $role = $this->getCurrentRole();
         $this->template->currentRole = $role;
         $this->template->isLoggedIn = $role !== null;
+        $this->template->currentUserName = $this->getCurrentUserName();
         $this->template->isTeacherRole = $this->isTeacherLikeRole();
         $this->template->isStudentRole = $role === self::ROLE_STUDENT;
     }
@@ -53,16 +56,27 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         return in_array($role, [self::ROLE_STUDENT, self::ROLE_TEACHER, self::ROLE_ADMIN], true) ? $role : null;
     }
 
-    protected function loginAs(string $role): void
+    protected function loginAs(string $role, ?string $userName = null): void
     {
         $session = $this->getSession(self::SESSION_SECTION);
         $session->{self::SESSION_ROLE_KEY} = $role;
+        $session->{self::SESSION_USER_NAME_KEY} = $userName;
+    }
+
+    protected function getCurrentUserName(): ?string
+    {
+        $session = $this->getSession(self::SESSION_SECTION);
+        $userName = $session->{self::SESSION_USER_NAME_KEY} ?? null;
+
+        return is_string($userName) && $userName !== '' ? $userName : null;
+
     }
 
     protected function logout(): void
     {
         $session = $this->getSession(self::SESSION_SECTION);
-        unset($session->{self::SESSION_ROLE_KEY});
+        unset($session->{self::SESSION_ROLE_KEY}, $session->{self::SESSION_USER_NAME_KEY});
+
     }
 
     protected function isTeacherLikeRole(): bool

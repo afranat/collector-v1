@@ -15,7 +15,7 @@ return array (
     'App\\Model\\IncentiveDemoService' => 
     array (
       0 => '/Applications/XAMPP/xamppfiles/htdocs/collector/web-project/app/Model/IncentiveDemoService.php',
-      1 => 1770925824,
+      1 => 1770928748,
     ),
     'App\\Presentation\\Home\\HomePresenter' => 
     array (
@@ -25,7 +25,7 @@ return array (
     'App\\Presentation\\Auth\\Login\\LoginPresenter' => 
     array (
       0 => '/Applications/XAMPP/xamppfiles/htdocs/collector/web-project/app/Presentation/Auth/Login/LoginPresenter.php',
-      1 => 1770927515,
+      1 => 1770928972,
     ),
     'App\\Presentation\\Student\\Offers\\OffersPresenter' => 
     array (
@@ -40,7 +40,7 @@ return array (
     'App\\Presentation\\BasePresenter' => 
     array (
       0 => '/Applications/XAMPP/xamppfiles/htdocs/collector/web-project/app/Presentation/BasePresenter.php',
-      1 => 1770927612,
+      1 => 1770930555,
     ),
     'App\\Presentation\\Accessory\\LatteExtension' => 
     array (
@@ -89,8 +89,9 @@ return array (
     'App\\Presentation\\Student\\Offers\\OffersTemplate' => 3,
     'App\\Presentation\\Student\\Profile\\ProfileDefaultTemplate' => 3,
     'App\\Presentation\\Student\\Profile\\ProfileTemplate' => 3,
-    'App\\Presentation\\Auth\\Login\\LoginDefaultTemplate' => 1,
-    'App\\Presentation\\Auth\\Login\\LoginTemplate' => 1,
+    'App\\Presentation\\Auth\\Login\\LoginDefaultTemplate' => 3,
+    'App\\Presentation\\Auth\\Login\\LoginTemplate' => 3,
+    'App\\Presentation\\Auth\\Login\\LoginLogoutTemplate' => 3,
   ),
   2 => 
   array (

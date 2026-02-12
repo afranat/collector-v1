@@ -21,9 +21,9 @@ final class Template_97c9459e0e extends Latte\Runtime\Template
 			return;
 		}
 
-		$this->renderBlock('title', get_defined_vars()) /* pos 2:1 */;
+		$this->renderBlock('title', get_defined_vars()) /* pos 1:1 */;
 		echo "\n";
-		$this->renderBlock('content', get_defined_vars()) /* pos 3:1 */;
+		$this->renderBlock('content', get_defined_vars()) /* pos 2:1 */;
 	}
 
 
@@ -32,7 +32,7 @@ final class Template_97c9459e0e extends Latte\Runtime\Template
 		extract($this->params);
 
 		if (!$this->getReferringTemplate() || $this->getReferenceType() === 'extends') {
-			foreach (array_intersect_key(['subject' => '13'], $this->params) as $ʟ_v => $ʟ_l) {
+			foreach (array_intersect_key(['subject' => '24'], $this->params) as $ʟ_v => $ʟ_l) {
 				trigger_error("Variable \$$ʟ_v overwritten in foreach on line $ʟ_l");
 			}
 		}
@@ -40,14 +40,14 @@ final class Template_97c9459e0e extends Latte\Runtime\Template
 	}
 
 
-	/** {block title} on line 2 */
+	/** {block title} on line 1 */
 	public function blockTitle(array $ʟ_args): void
 	{
 		echo 'Sbírej a uč se';
 	}
 
 
-	/** {block content} on line 3 */
+	/** {block content} on line 2 */
 	public function blockContent(array $ʟ_args): void
 	{
 		extract($this->params);
@@ -59,16 +59,59 @@ final class Template_97c9459e0e extends Latte\Runtime\Template
 	<p>
 		Každý krok se počítá – vyber si předmět, uč se pravidelně a sleduj, jak se tvoje znalosti každý den rozrůstají.
 	</p>
-
+';
+		if (!$isLoggedIn) /* pos 8:2 */ {
+			echo '		<p><a href="';
+			echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Auth:Login:default')) /* pos 9:9 */;
+			echo '">Přejít na přihlášení</a></p>
+';
+		} else /* pos 10:2 */ {
+			echo '		<h2>Dostupné karty</h2>
+		<ul>
+';
+			if ($isTeacherRole) /* pos 13:8 */ {
+				echo '			<li><a href="';
+				echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Teacher:Subjects:default')) /* pos 13:33 */;
+				echo '">Karta: Zadání tématu</a></li>
+';
+			}
+			if ($isTeacherRole) /* pos 14:8 */ {
+				echo '			<li><a href="';
+				echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Teacher:Badges:default')) /* pos 14:33 */;
+				echo '">Karta: Odznaky</a></li>
+';
+			}
+			if ($isTeacherRole) /* pos 15:8 */ {
+				echo '			<li><a href="';
+				echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Teacher:Collaboration:default')) /* pos 15:33 */;
+				echo '">Karta: Spolupráce</a></li>
+';
+			}
+			if ($isStudentRole) /* pos 16:8 */ {
+				echo '			<li><a href="';
+				echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Student:Offers:default')) /* pos 16:33 */;
+				echo '">Karta: Pobídky</a></li>
+';
+			}
+			if ($isStudentRole) /* pos 17:8 */ {
+				echo '			<li><a href="';
+				echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Student:Profile:default')) /* pos 17:33 */;
+				echo '">Karta: Profil</a></li>
+';
+			}
+			echo '		</ul>
+';
+		}
+		echo '
 	<h2>Předměty</h2>
 ';
-		if ($subjects) /* pos 11:2 */ {
+		if ($subjects) /* pos 22:2 */ {
 			echo '		<ul>
 ';
-			foreach ($subjects as $subject) /* pos 13:8 */ {
+			foreach ($subjects as $subject) /* pos 24:8 */ {
 				echo '			<li>
 				';
-				echo LR\HtmlHelpers::escapeText($subject->name ?? $subject->title ?? 'Předmět #' . ($subject->id ?? 'bez ID')) /* pos 14:5 */;
+				echo LR\HtmlHelpers::escapeText($subject->name ?? $subject->title ?? 'Předmět #' . ($subject->id ?? 'bez ID')) /* pos 25:5 */;
 				echo '
 			</li>
 ';
@@ -77,7 +120,7 @@ final class Template_97c9459e0e extends Latte\Runtime\Template
 
 			echo '		</ul>
 ';
-		} else /* pos 17:2 */ {
+		} else /* pos 28:2 */ {
 			echo '		<p>Zatím nejsou k dispozici žádné předměty.</p>
 ';
 		}

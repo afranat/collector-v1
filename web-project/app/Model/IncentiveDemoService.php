@@ -317,7 +317,10 @@ final class IncentiveDemoService
                 'email' => 'teacher@example.local',
                 'name' => 'Demo Teacher',
                 'role' => 'teacher',
+                'secret' => 'teacher',
             ]);
+        } elseif (empty($teacher->secret)) {
+            $teacher->update(['secret' => 'teacher']);
         }
 
         $student = $this->database->table('user_account')->where('id', 2)->fetch();
@@ -327,7 +330,10 @@ final class IncentiveDemoService
                 'email' => 'student@example.local',
                 'name' => 'Demo Student',
                 'role' => 'student',
+                'secret' => 'student',
             ]);
+        } elseif (empty($student->secret)) {
+            $student->update(['secret' => 'student']);
         }
     }
 
