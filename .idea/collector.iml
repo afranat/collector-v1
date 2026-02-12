@@ -27,6 +27,10 @@
       <excludeFolder url="file://$MODULE_DIR$/web-project/vendor/phpstan/phpstan-nette" />
       <excludeFolder url="file://$MODULE_DIR$/web-project/vendor/symfony/thanks" />
       <excludeFolder url="file://$MODULE_DIR$/web-project/vendor/tracy/tracy" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/nette/caching" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/nette/database" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/nette/utils" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

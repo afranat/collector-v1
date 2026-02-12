@@ -17,6 +17,8 @@ final class HomePresenter extends Nette\Application\UI\Presenter
 
     public function renderDefault(): void
     {
-        $this->template->subjects = $this->database->table('subjects')->fetchAll();
+
+
+        $this->template->subjects = $this->database->table('subject')->fetchAll();
     }
 }

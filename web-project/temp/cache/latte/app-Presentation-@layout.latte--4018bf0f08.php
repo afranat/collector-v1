@@ -23,39 +23,70 @@ final class Template_4018bf0f08 extends Latte\Runtime\Template
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
 
+
 	<title>';
-		if ($this->hasBlock('title')) /* pos 7:9 */ {
+		if ($this->hasBlock('title')) /* pos 8:9 */ {
 			$this->renderBlock('title', [], function ($s, $type) {
 				$ʟ_fi = new LR\FilterInfo($type);
 				return LR\Helpers::convertTo($ʟ_fi, 'html', $this->filters->filterContent('stripHtml', $ʟ_fi, $s));
-			}) /* pos 7:22 */;
+			}) /* pos 8:22 */;
 			echo ' | ';
 		}
-		echo 'Nette Web</title>
+		echo 'Collector</title>
 
-	';
-		if ($ʟ_tmp = $this->global->assets->resolve('main.js', [], true)) /* pos 9:2 */ {
-			echo $this->global->assets->renderAsset($ʟ_tmp);
-		}echo '
+	<script src="';
+		echo LR\HtmlHelpers::escapeAttr($basePath) /* pos 10:15 */;
+		echo '/assets/main.js"></script>
+
+	<style>
+		body { font-family: Arial, sans-serif; margin: 1.5rem; }
+		nav ul { display: flex; gap: 1rem; list-style: none; padding: 0; flex-wrap: wrap; }
+		nav a { text-decoration: none; }
+		table { border-collapse: collapse; width: 100%; }
+		th, td { border: 1px solid #ddd; padding: .4rem; text-align: left; }
+		.flash { padding: .5rem; background: #eff7ff; margin-bottom: .75rem; }
+	</style>
 </head>
 
 <body>
+<nav>
+	<ul>
+		<li><a href="';
+		echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Home:default')) /* pos 25:10 */;
+		echo '">Domů</a></li>
+		<li><a href="';
+		echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Teacher:Subjects:default')) /* pos 26:10 */;
+		echo '">Učitel: témata</a></li>
+		<li><a href="';
+		echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Teacher:Badges:default')) /* pos 27:10 */;
+		echo '">Učitel: odznaky</a></li>
+		<li><a href="';
+		echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Teacher:Collaboration:default')) /* pos 28:10 */;
+		echo '">Učitel: spolupráce</a></li>
+		<li><a href="';
+		echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Student:Offers:default')) /* pos 29:10 */;
+		echo '">Žák: pobídky</a></li>
+		<li><a href="';
+		echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Student:Profile:default')) /* pos 30:10 */;
+		echo '">Žák: profil</a></li>
+	</ul>
+</nav>
+
 ';
-		foreach ($flashes as $flash) /* pos 13:7 */ {
-			echo '	<div';
-			echo ($ʟ_tmp = array_filter(['flash', $flash->type])) ? ' class="' . LR\HtmlHelpers::escapeAttr(implode(" ", array_unique($ʟ_tmp))) . '"' : "" /* pos 13:38 */;
+		foreach ($flashes as $flash) /* pos 34:6 */ {
+			echo '<div';
+			echo ($ʟ_tmp = array_filter(['flash', $flash->type])) ? ' class="' . LR\HtmlHelpers::escapeAttr(implode(" ", array_unique($ʟ_tmp))) . '"' : "" /* pos 34:37 */;
 			echo '>';
-			echo LR\HtmlHelpers::escapeText($flash->message) /* pos 13:68 */;
+			echo LR\HtmlHelpers::escapeText($flash->message) /* pos 34:67 */;
 			echo '</div>
 ';
 
 		}
 
 		echo "\n";
-		$this->renderBlock('content', [], 'html') /* pos 15:2 */;
+		$this->renderBlock('content', [], 'html') /* pos 36:1 */;
 		echo '</body>
-</html>
-';
+</html>';
 	}
 
 
@@ -64,7 +95,7 @@ final class Template_4018bf0f08 extends Latte\Runtime\Template
 		extract($this->params);
 
 		if (!$this->getReferringTemplate() || $this->getReferenceType() === 'extends') {
-			foreach (array_intersect_key(['flash' => '13'], $this->params) as $ʟ_v => $ʟ_l) {
+			foreach (array_intersect_key(['flash' => '34'], $this->params) as $ʟ_v => $ʟ_l) {
 				trigger_error("Variable \$$ʟ_v overwritten in foreach on line $ʟ_l");
 			}
 		}

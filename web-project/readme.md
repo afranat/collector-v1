@@ -62,3 +62,5 @@ Minimal Skeleton
 
 For demonstrating issues or similar tasks, rather than starting a new project, use
 [minimal skeleton](https://github.com/nette/web-project/tree/minimal).
+# collector-new
+# collector-v1
