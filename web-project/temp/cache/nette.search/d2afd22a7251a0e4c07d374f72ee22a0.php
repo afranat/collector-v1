@@ -25,7 +25,7 @@ return array (
     'App\\Presentation\\Auth\\Login\\LoginPresenter' => 
     array (
       0 => '/Applications/XAMPP/xamppfiles/htdocs/collector/web-project/app/Presentation/Auth/Login/LoginPresenter.php',
-      1 => 1770988794,
+      1 => 1770990665,
     ),
     'App\\Presentation\\Student\\Offers\\OffersPresenter' => 
     array (

@@ -83,10 +83,14 @@ final class LoginPresenter extends BasePresenter
         return $form;
     }
 
-    public function handleLogout(): void
+    public function actionLogout(): void
     {
         $this->logout();
         $this->flashMessage('Byli jste odhlášeni.');
         $this->redirect('default');
+    }
+    public function handleLogout(): void
+    {
+        $this->actionLogout();
     }
 }
