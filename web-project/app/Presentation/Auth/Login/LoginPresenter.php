@@ -6,13 +6,14 @@ namespace App\Presentation\Auth\Login;
 
 use App\Model\IncentiveDemoService;
 use App\Presentation\BasePresenter;
-use Nette\Database\Explorer;
-use Nette\Application\UI\Form;
 
+use Nette\Application\UI\Form;
+use Nette\Database\Explorer;
 final class LoginPresenter extends BasePresenter
 {
     public function __construct(
         private readonly IncentiveDemoService $incentiveDemoService,
+        private readonly Explorer $database,
     ) {
         parent::__construct();
     }
@@ -46,13 +47,7 @@ final class LoginPresenter extends BasePresenter
             ->setRequired('Zadejte tajné slovo.');
 
         $form->addSubmit('send', 'Přihlásit se');
-        $form->onValidate[] = function (Form $form, \stdClass $values): void {
 
-
-            if ($values->studentUserId === null || $values->studentUserId === '') {
-                $form['studentUserId']->addError('Vyberte studentský účet.');
-            }
-        };
         $form->onSuccess[] = function (Form $form, \stdClass $values): void {
 
             $userAccount = $this->database->table('user_account')
@@ -73,7 +68,7 @@ final class LoginPresenter extends BasePresenter
             $this->loginAs($role);
 
             if ($role === self::ROLE_STUDENT) {
-                $this->loginAsUser(self::ROLE_STUDENT, (int) $values->studentUserId);
+                $this->loginAsUser(self::ROLE_STUDENT, (int) $userAccount->id);
                 $this->redirect(':Student:Profile:default');
             }
 
