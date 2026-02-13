@@ -96,15 +96,22 @@ final class Template_4018bf0f08 extends Latte\Runtime\Template
 			<strong>Role: ';
 			echo LR\HtmlHelpers::escapeText($currentRole) /* pos 33:18 */;
 			echo '</strong>
-			';
-			if ($currentUserName !== null) /* pos 34:4 */ {
+';
+			if ($currentUserId !== null) /* pos 34:10 */ {
+				echo '			<span> · účet #';
+				echo LR\HtmlHelpers::escapeText($currentUserId) /* pos 34:53 */;
+				echo '</span>
+';
+			}
+			echo '			';
+			if ($currentUserName !== null) /* pos 35:4 */ {
 				echo '· <strong>Uživatel: ';
-				echo LR\HtmlHelpers::escapeText($currentUserName) /* pos 34:56 */;
+				echo LR\HtmlHelpers::escapeText($currentUserName) /* pos 35:56 */;
 				echo '</strong>';
 			}
 			echo '
 			· <a href="';
-			echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Auth:Login:logout')) /* pos 35:10 */;
+			echo LR\HtmlHelpers::escapeAttr($this->global->uiControl->link(':Auth:Login:logout')) /* pos 36:10 */;
 			echo '">Odhlásit</a>
 
 		</li>
@@ -114,18 +121,18 @@ final class Template_4018bf0f08 extends Latte\Runtime\Template
 </nav>
 
 ';
-		foreach ($flashes as $flash) /* pos 41:6 */ {
+		foreach ($flashes as $flash) /* pos 42:6 */ {
 			echo '<div';
-			echo ($ʟ_tmp = array_filter(['flash', $flash->type])) ? ' class="' . LR\HtmlHelpers::escapeAttr(implode(" ", array_unique($ʟ_tmp))) . '"' : "" /* pos 41:37 */;
+			echo ($ʟ_tmp = array_filter(['flash', $flash->type])) ? ' class="' . LR\HtmlHelpers::escapeAttr(implode(" ", array_unique($ʟ_tmp))) . '"' : "" /* pos 42:37 */;
 			echo '>';
-			echo LR\HtmlHelpers::escapeText($flash->message) /* pos 41:67 */;
+			echo LR\HtmlHelpers::escapeText($flash->message) /* pos 42:67 */;
 			echo '</div>
 ';
 
 		}
 
 		echo "\n";
-		$this->renderBlock('content', [], 'html') /* pos 43:1 */;
+		$this->renderBlock('content', [], 'html') /* pos 44:1 */;
 		echo '</body>
 </html>';
 	}
@@ -136,7 +143,7 @@ final class Template_4018bf0f08 extends Latte\Runtime\Template
 		extract($this->params);
 
 		if (!$this->getReferringTemplate() || $this->getReferenceType() === 'extends') {
-			foreach (array_intersect_key(['flash' => '41'], $this->params) as $ʟ_v => $ʟ_l) {
+			foreach (array_intersect_key(['flash' => '42'], $this->params) as $ʟ_v => $ʟ_l) {
 				trigger_error("Variable \$$ʟ_v overwritten in foreach on line $ʟ_l");
 			}
 		}

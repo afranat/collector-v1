@@ -14,6 +14,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     private const SESSION_SECTION = 'auth';
     private const SESSION_ROLE_KEY = 'role';
+    private const SESSION_USER_ID_KEY = 'userId';
 
     private const SESSION_USER_NAME_KEY = 'userName';
 
@@ -41,7 +42,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         parent::beforeRender();
 
         $role = $this->getCurrentRole();
+        $userId = $this->getCurrentUserId();
         $this->template->currentRole = $role;
+        $this->template->currentUserId = $userId;
         $this->template->isLoggedIn = $role !== null;
         $this->template->currentUserName = $this->getCurrentUserName();
         $this->template->isTeacherRole = $this->isTeacherLikeRole();
@@ -58,11 +61,19 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     protected function loginAs(string $role, ?string $userName = null): void
     {
+        $this->loginAsUser($role, null);
+    }
+    protected function loginAsUser(string $role, ?int $userId): void
+    {
         $session = $this->getSession(self::SESSION_SECTION);
         $session->{self::SESSION_ROLE_KEY} = $role;
-        $session->{self::SESSION_USER_NAME_KEY} = $userName;
-    }
+        if ($userId !== null) {
+            $session->{self::SESSION_USER_ID_KEY} = $userId;
+            return;
+        }
 
+        unset($session->{self::SESSION_USER_ID_KEY});
+    }
     protected function getCurrentUserName(): ?string
     {
         $session = $this->getSession(self::SESSION_SECTION);
@@ -76,7 +87,15 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     {
         $session = $this->getSession(self::SESSION_SECTION);
         unset($session->{self::SESSION_ROLE_KEY}, $session->{self::SESSION_USER_NAME_KEY});
+        unset($session->{self::SESSION_USER_ID_KEY});
+    }
 
+    protected function getCurrentUserId(): ?int
+    {
+        $session = $this->getSession(self::SESSION_SECTION);
+        $userId = $session->{self::SESSION_USER_ID_KEY} ?? null;
+
+        return is_int($userId) && $userId > 0 ? $userId : null;
     }
 
     protected function isTeacherLikeRole(): bool

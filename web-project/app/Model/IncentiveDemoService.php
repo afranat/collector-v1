@@ -14,6 +14,23 @@ final class IncentiveDemoService
     }
 
     /**
+     * @return array<int, array{id:int,name:string,email:string}>
+     */
+    public function getStudents(): array
+    {
+        $this->ensureDemoUsers();
+
+        return array_map(
+            static fn ($row): array => [
+                'id' => (int) $row->id,
+                'name' => (string) $row->name,
+                'email' => (string) $row->email,
+            ],
+            $this->database->table('user_account')->where('role', 'student')->order('id ASC')->fetchAll(),
+        );
+    }
+
+    /**
      * @return array<int, array{id:int,title:string,ownerUserId:int,isArchived:bool}>
      */
     public function getSubjects(): array
@@ -90,12 +107,17 @@ final class IncentiveDemoService
     /**
      * @return array<int, array{id:int,offerId:int,studentUserId:int,status:string,evidence:string|null,decisionNote:string|null}>
      */
-    public function getClaimsForSubject(int $subjectId): array
+    public function getClaimsForSubject(int $subjectId, ?int $studentUserId = null): array
     {
-        $claims = $this->database->table('offer_claim')
+        $selection = $this->database->table('offer_claim')
             ->where('offer.subject_id', $subjectId)
-            ->order('id ASC')
-            ->fetchAll();
+            ->order('id ASC');
+
+        if ($studentUserId !== null) {
+            $selection->where('student_user_id', $studentUserId);
+        }
+
+        $claims = $selection->fetchAll();;
 
         return array_map(
             static fn ($claim): array => [

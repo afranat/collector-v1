@@ -31,6 +31,7 @@
 		<li n:if="!$isLoggedIn"><a n:href=":Auth:Login:default">Přihlásit</a></li>
 		<li n:if="$isLoggedIn">
 			<strong>Role: {$currentRole}</strong>
+			<span n:if="$currentUserId !== null"> · účet #{$currentUserId}</span>
 			{if $currentUserName !== null}· <strong>Uživatel: {$currentUserName}</strong>{/if}
 			· <a n:href=":Auth:Login:logout">Odhlásit</a>
 
