@@ -15,7 +15,7 @@
         </form>
 
         <section>
-            <h2>Publikovat pobídku</h2>
+            <h2>Publikovat / upravit pobídku</h2>
             {control offerForm}
         </section>
 
@@ -24,9 +24,10 @@
             {if $offers}
                 <ul>
                     <li n:foreach="$offers as $offer">
-                        <strong>{$offer['title']}</strong>
+                        <a n:href="default subjectId: $subjectId, offerId: $offer['id']"><strong>{$offer['title']}</strong></a>
                         – {$offer['description']}
                         (<em>{if $offer['requiresApproval']}vyžaduje schválení{else}auto-schválení{/if}</em>)
+                        <a n:href="deleteOffer! offerId: $offer['id'], subjectId: $subjectId" onclick="return confirm('Opravdu chcete tuto pobídku smazat?');">Smazat</a>
                     </li>
                 </ul>
             {else}

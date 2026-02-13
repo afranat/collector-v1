@@ -225,6 +225,52 @@ final class IncentiveDemoService
             ]);
         }
     }
+    /**
+     * @param int[] $badgeIds
+     */
+    public function updateOffer(int $offerId, int $subjectId, string $title, string $description, bool $requiresApproval, array $badgeIds): void
+    {
+        $offer = $this->database->table('offer')
+            ->where('id', $offerId)
+            ->where('subject_id', $subjectId)
+            ->where('status', 'published')
+            ->fetch();
+
+        if ($offer === null) {
+            return;
+        }
+
+        $offer->update([
+            'title' => $title,
+            'description' => $description,
+            'requires_approval' => $requiresApproval ? 1 : 0,
+        ]);
+
+        $this->database->table('offer_reward')->where('offer_id', $offerId)->delete();
+        foreach ($badgeIds as $badgeId) {
+            $this->database->table('offer_reward')->insert([
+                'offer_id' => $offerId,
+                'badge_id' => $badgeId,
+                'qty' => 1,
+                'exp_bonus' => 0,
+            ]);
+        }
+    }
+
+    public function archiveOffer(int $offerId, int $subjectId): void
+    {
+        $offer = $this->database->table('offer')
+            ->where('id', $offerId)
+            ->where('subject_id', $subjectId)
+            ->where('status', 'published')
+            ->fetch();
+
+        if ($offer === null) {
+            return;
+        }
+
+        $offer->update(['status' => 'archived']);
+    }
 
     public function acceptOffer(int $offerId, int $studentUserId): void
     {
