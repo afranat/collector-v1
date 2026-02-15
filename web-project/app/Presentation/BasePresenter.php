@@ -61,12 +61,19 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     protected function loginAs(string $role, ?string $userName = null): void
     {
-        $this->loginAsUser($role, null);
+        $this->loginAsUser($role, null, $userName);
     }
-    protected function loginAsUser(string $role, ?int $userId): void
+    protected function loginAsUser(string $role, ?int $userId, ?string $userName = null): void
     {
         $session = $this->getSession(self::SESSION_SECTION);
         $session->{self::SESSION_ROLE_KEY} = $role;
+
+        if (is_string($userName) && $userName !== '') {
+            $session->{self::SESSION_USER_NAME_KEY} = $userName;
+        } else {
+            unset($session->{self::SESSION_USER_NAME_KEY});
+        }
+
         if ($userId !== null) {
             $session->{self::SESSION_USER_ID_KEY} = $userId;
             return;

@@ -65,10 +65,12 @@ final class LoginPresenter extends BasePresenter
                 return;
             }
 
-            $this->loginAs($role);
+            $userName = is_string($userAccount->name ?? null) ? trim($userAccount->name) : null;
+
+            $this->loginAs($role, $userName);
 
             if ($role === self::ROLE_STUDENT) {
-                $this->loginAsUser(self::ROLE_STUDENT, (int) $userAccount->id);
+                $this->loginAsUser(self::ROLE_STUDENT, (int) $userAccount->id, $userName);;
                 $this->redirect(':Student:Profile:default');
             }
 
